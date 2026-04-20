@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { generateOrderRef } from '@/shared/lib/generateOrderRef'
+import { generateId } from '@/shared/lib/generateId'
 import { MAX_DRAFTS } from '@/shared/config/constants'
 import {
   saveDraft,
@@ -52,7 +53,7 @@ export const useDraftsStore = create<DraftsState>((set, get) => ({
     const { drafts } = get()
     if (drafts.length >= MAX_DRAFTS) return drafts[drafts.length - 1].id
 
-    const id = `draft_${Date.now()}`
+    const id = generateId('draft')
     const newDraft: LocalDraft = {
       id,
       title: 'New Draft',
@@ -60,7 +61,7 @@ export const useDraftsStore = create<DraftsState>((set, get) => ({
         referenceNumber: generateOrderRef(),
         stops: [
           {
-            id: `s_${Date.now()}_0`,
+            id: generateId('stop'),
             type: 'pick_up',
             order: 0,
             address: { city: '', state: '', zip: '' },
@@ -68,7 +69,7 @@ export const useDraftsStore = create<DraftsState>((set, get) => ({
             appointmentDate: '',
           },
           {
-            id: `s_${Date.now()}_1`,
+            id: generateId('stop'),
             type: 'drop_off',
             order: 1,
             address: { city: '', state: '', zip: '' },
@@ -90,13 +91,17 @@ export const useDraftsStore = create<DraftsState>((set, get) => ({
     const { drafts } = get()
     const updated = drafts.map((d) => {
       if (d.id !== id) return d
+      const mergedFormData: Partial<CreateOrderInput> = {
+        ...d.formData,
+        ...data,
+      }
       const next: LocalDraft = {
         ...d,
-        formData: data,
+        formData: mergedFormData,
         savedAt: new Date().toISOString(),
         title:
-          (data.referenceNumber && data.referenceNumber !== 'ORD-YYYY-NNNN'
-            ? data.referenceNumber
+          (mergedFormData.referenceNumber && mergedFormData.referenceNumber !== 'ORD-YYYY-NNNN'
+            ? mergedFormData.referenceNumber
             : null) ?? d.title,
       }
       saveDraft(next)

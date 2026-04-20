@@ -1,5 +1,12 @@
 import { format, parseISO } from 'date-fns'
-import type { Stop } from '@/entities/order/model/types'
+
+type RouteStop = {
+  type: 'pick_up' | 'drop_off' | 'stop'
+  address: {
+    city: string
+    state: string
+  }
+}
 
 export function formatDate(isoString: string | null): string {
   if (!isoString) return '—'
@@ -31,7 +38,7 @@ export function formatWeight(lbs: number): string {
   return `${new Intl.NumberFormat('en-US').format(lbs)} lbs`
 }
 
-export function formatRoute(stops: Stop[]): { primary: string; extra: number } {
+export function formatRoute(stops: RouteStop[]): { primary: string; extra: number } {
   const pickup = stops.find((s) => s.type === 'pick_up')
   const dropoff = stops.find((s) => s.type === 'drop_off')
   const extraStops = stops.filter((s) => s.type === 'stop').length

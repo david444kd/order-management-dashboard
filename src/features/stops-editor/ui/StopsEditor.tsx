@@ -1,6 +1,7 @@
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { Plus, MapPin } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
+import { generateId } from '@/shared/lib/generateId'
 import { MAX_STOPS, MIN_STOPS } from '@/shared/config/constants'
 import type { CreateOrderInput } from '@/shared/zod/orderSchemas'
 import { StopCard } from './StopCard'
@@ -30,7 +31,7 @@ export function StopsEditor() {
   const handleAdd = () => {
     if (!canAdd) return
     append({
-      id: `s_${Date.now()}`,
+      id: generateId('stop'),
       type: 'stop',
       order: fields.length,
       address: { city: '', state: '', zip: '' },

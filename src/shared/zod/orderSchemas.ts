@@ -67,15 +67,31 @@ export const stopsSectionSchema = z
     { message: 'Must have at least one Pick Up and one Drop Off', path: ['stops'] },
   )
 
-// --- Full create schema ---
-export const createOrderSchema = clientSectionSchema
+const createOrderBaseSchema = clientSectionSchema
   .merge(orderSectionSchema)
-  .merge(stopsSectionSchema)
+  .merge(
+    z.object({
+      stops: z
+        .array(stopSchema)
+        .min(2, 'At least 2 stops required')
+        .max(5, 'Maximum 5 stops'),
+    }),
+  )
+
+// --- Full create schema ---
+export const createOrderSchema = createOrderBaseSchema
+  .refine(
+    (data) => {
+      const types = data.stops.map((s) => s.type)
+      return types.includes('pick_up') && types.includes('drop_off')
+    },
+    { message: 'Must have at least one Pick Up and one Drop Off', path: ['stops'] },
+  )
 
 export type CreateOrderInput = z.infer<typeof createOrderSchema>
 
 // --- Update schema ---
-export const updateOrderSchema = createOrderSchema.partial()
+export const updateOrderSchema = createOrderBaseSchema.partial()
 export type UpdateOrderInput = z.infer<typeof updateOrderSchema>
 
 // --- Status change schema ---
@@ -87,7 +103,7 @@ export const statusChangeSchema = z.object({
 // --- Cancel schema (note required) ---
 export const cancelOrderSchema = z.object({
   to: z.literal('cancelled'),
-  note: z.string().min(1, 'Cancellation reason is required').max(500).trim(),
+  note: z.string().trim().min(1, 'Cancellation reason is required').max(500),
 })
 export type CancelOrderInput = z.infer<typeof cancelOrderSchema>
 

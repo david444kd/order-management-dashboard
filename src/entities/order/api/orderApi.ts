@@ -1,4 +1,5 @@
 import { delay, maybeError } from '@/shared/api/mockClient'
+import { generateId } from '@/shared/lib/generateId'
 import { MOCK_DB_ORDERS_KEY, MOCK_DB_CARRIERS_KEY } from '@/shared/config/constants'
 import type { PageSize } from '@/shared/config/constants'
 import type { PaginatedResponse, SortDirection } from '@/shared/types/pagination'
@@ -139,7 +140,7 @@ export const orderApi = {
     const now = new Date().toISOString()
 
     const newOrder: Order = {
-      id: `o${Date.now()}`,
+      id: generateId('order'),
       referenceNumber: input.referenceNumber,
       status: 'pending',
       clientName: input.clientName,
@@ -147,7 +148,7 @@ export const orderApi = {
       equipmentType: input.equipmentType,
       loadType: input.loadType,
       stops: input.stops.map((stop, idx) => ({
-        id: stop.id ?? `s${Date.now()}_${idx}`,
+        id: stop.id ?? generateId('stop'),
         type: stop.type,
         order: idx,
         address: stop.address,
@@ -200,7 +201,7 @@ export const orderApi = {
       ...(input.notes !== undefined && { notes: input.notes }),
       ...(input.stops !== undefined && {
         stops: input.stops.map((stop, i) => ({
-          id: stop.id ?? `s${Date.now()}_${i}`,
+          id: stop.id ?? generateId('stop'),
           type: stop.type,
           order: i,
           address: stop.address,

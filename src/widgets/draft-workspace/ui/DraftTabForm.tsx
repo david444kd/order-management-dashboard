@@ -1,5 +1,5 @@
-import { useEffect, useRef, useCallback } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { useEffect, useCallback } from 'react'
+import { useForm, useWatch, type SubmitHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form } from '@/shared/ui/form'
 import { Button } from '@/shared/ui/button'
@@ -17,7 +17,6 @@ interface DraftTabFormProps {
 
 export function DraftTabForm({ draftId, defaultValues, onSubmit }: DraftTabFormProps) {
   const { updateDraft } = useDraftsStore()
-  const submitBtnRef = useRef<HTMLButtonElement>(null)
 
   const form = useForm<CreateOrderInput>({
     resolver: zodResolver(createOrderSchema),
@@ -32,7 +31,6 @@ export function DraftTabForm({ draftId, defaultValues, onSubmit }: DraftTabFormP
       notes: defaultValues.notes ?? '',
       stops: defaultValues.stops ?? [
         {
-          id: `s_${Date.now()}_0`,
           type: 'pick_up',
           order: 0,
           address: { city: '', state: '', zip: '' },
@@ -43,7 +41,6 @@ export function DraftTabForm({ draftId, defaultValues, onSubmit }: DraftTabFormP
           notes: '',
         },
         {
-          id: `s_${Date.now()}_1`,
           type: 'drop_off',
           order: 1,
           address: { city: '', state: '', zip: '' },
@@ -56,6 +53,7 @@ export function DraftTabForm({ draftId, defaultValues, onSubmit }: DraftTabFormP
       ],
     },
   })
+  const watchedValues = useWatch({ control: form.control })
 
   const saveCurrentValues = useCallback(() => {
     const values = form.getValues()
@@ -69,16 +67,9 @@ export function DraftTabForm({ draftId, defaultValues, onSubmit }: DraftTabFormP
   }, [saveCurrentValues])
 
   useEffect(() => {
-    let debounceTimer: ReturnType<typeof setTimeout>
-    const subscription = form.watch(() => {
-      clearTimeout(debounceTimer)
-      debounceTimer = setTimeout(saveCurrentValues, 500)
-    })
-    return () => {
-      subscription.unsubscribe()
-      clearTimeout(debounceTimer)
-    }
-  }, [form, saveCurrentValues])
+    const debounceTimer = setTimeout(saveCurrentValues, 500)
+    return () => clearTimeout(debounceTimer)
+  }, [watchedValues, saveCurrentValues])
 
   // Wire the external "Submit Draft" button in the workspace header
   useEffect(() => {
@@ -100,7 +91,7 @@ export function DraftTabForm({ draftId, defaultValues, onSubmit }: DraftTabFormP
 
         {/* Inline submit at bottom */}
         <div className="flex justify-end pt-4 border-t">
-          <Button type="submit" className="gap-2" ref={submitBtnRef}>
+          <Button type="submit" className="gap-2">
             {form.formState.isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
