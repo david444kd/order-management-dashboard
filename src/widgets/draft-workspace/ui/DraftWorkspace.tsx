@@ -60,19 +60,28 @@ export function DraftWorkspace() {
         <div className="flex items-center overflow-x-auto scrollbar-hide border-b">
           <div className="flex items-center min-w-0 flex-1">
             {drafts.map((draft) => (
-              <button
+              <div
                 key={draft.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => setActiveDraft(draft.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setActiveDraft(draft.id)
+                  }
+                }}
                 className={cn(
-                  'flex items-center gap-2 px-4 py-2.5 text-sm whitespace-nowrap border-r transition-colors group shrink-0 max-w-[180px]',
+                  'flex items-center gap-2 px-4 py-2.5 text-sm whitespace-nowrap border-r transition-colors group shrink-0 max-w-[180px] cursor-pointer',
                   activeDraftId === draft.id
                     ? 'bg-background text-foreground font-medium border-b-2 border-b-primary -mb-px'
                     : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground',
                 )}
               >
                 <span className="truncate">{draft.title}</span>
-                <span
-                  role="button"
+                <button
+                  type="button"
+                  aria-label={`Close draft ${draft.title}`}
                   onClick={(e) => {
                     e.stopPropagation()
                     deleteDraft(draft.id)
@@ -80,8 +89,8 @@ export function DraftWorkspace() {
                   className="ml-1 h-4 w-4 rounded-sm opacity-0 group-hover:opacity-100 hover:bg-destructive/20 flex items-center justify-center shrink-0 transition-opacity"
                 >
                   <X className="h-3 w-3" />
-                </span>
-              </button>
+                </button>
+              </div>
             ))}
             {drafts.length < MAX_DRAFTS && (
               <button

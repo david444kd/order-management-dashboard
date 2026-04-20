@@ -29,13 +29,13 @@ import {
   SelectValue,
 } from '@/shared/ui/select'
 import { useOrders } from '@/entities/order'
-import { useUIStore } from '@/features/manage-drafts/model/uiStore'
-import { useDraftsStore } from '@/features/manage-drafts/model/draftsStore'
+import { useUIStore, useDraftsStore } from '@/features/manage-drafts'
 import { StatusBadge } from '@/features/change-order-status'
 import { EQUIPMENT_LABELS, LOAD_TYPE_LABELS } from '@/features/change-order-status'
 import { DeleteOrderDialog } from '@/features/delete-order'
 import { formatCurrency, formatDateShort, formatRoute, formatPaginationInfo } from '@/shared/lib/formatters'
-import { PAGE_SIZES } from '@/shared/config/constants'
+import { generateId } from '@/shared/lib/generateId'
+import { MAX_DRAFTS, PAGE_SIZES } from '@/shared/config/constants'
 import { useDebounce } from '@/shared/hooks/useDebounce'
 import { TableHead, TableRow, TableCell } from './TableComponents'
 import { OrdersTableSkeleton } from './OrdersTableSkeleton'
@@ -78,8 +78,8 @@ export function OrdersTable() {
   })
 
   const handleDuplicateAsDraft = (order: Order) => {
-    if (drafts.length >= 5) {
-      toast.error('Maximum 5 drafts allowed. Close a draft first.')
+    if (drafts.length >= MAX_DRAFTS) {
+      toast.error(`Maximum ${MAX_DRAFTS} drafts allowed. Close a draft first.`)
       return
     }
     const id = createDraft()
@@ -95,7 +95,7 @@ export function OrdersTable() {
       notes: order.notes,
       stops: order.stops.map((s) => ({
         ...s,
-        id: `s_${Date.now()}_${s.order}`,
+        id: generateId('stop'),
         appointmentDate: s.appointmentDate ?? '',
       })),
     })

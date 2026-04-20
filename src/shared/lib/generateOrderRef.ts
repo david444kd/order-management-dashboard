@@ -1,5 +1,8 @@
 import { MOCK_DB_ORDERS_KEY } from '@/shared/config/constants'
-import type { Order } from '@/entities/order/model/types'
+
+type OrderRefRecord = {
+  referenceNumber: string
+}
 
 export function generateOrderRef(): string {
   const year = new Date().getFullYear()
@@ -8,7 +11,7 @@ export function generateOrderRef(): string {
   try {
     const raw = localStorage.getItem(MOCK_DB_ORDERS_KEY)
     if (raw) {
-      const orders = JSON.parse(raw) as Order[]
+      const orders = JSON.parse(raw) as OrderRefRecord[]
       for (const order of orders) {
         const match = order.referenceNumber.match(/ORD-\d{4}-(\d{4})/)
         if (match) {
