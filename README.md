@@ -1,8 +1,8 @@
-# Order Management Dashboard
+``# Order Management Dashboard
 
 Прототип TMS-модуля для управления грузовыми заказами. Бэкенда нет — всё работает через mock API в localStorage, чтобы можно было оценить UX и зафиксировать data-контракт до старта бэкенда.
 
-**Демо:** [TODO]
+**Демо:** https://order-management444.netlify.app/
 
 ---
 
@@ -38,7 +38,7 @@ npm run build
 
 ```
 src/
-├── app/          # роутер (lazy routes), провайдеры
+├── app/          # роутер (lazy routes), провайдеры``
 ├── pages/        # тонкая композиция экранов
 ├── widgets/      # крупные блоки: OrdersTable, DraftWorkspace
 ├── features/     # сценарии: filter-orders, change-order-status, manage-drafts…
