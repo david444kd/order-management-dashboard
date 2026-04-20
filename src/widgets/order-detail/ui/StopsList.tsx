@@ -33,10 +33,11 @@ export function StopsList({ stops }: StopsListProps) {
     <div className="space-y-0">
       {sorted.map((stop, idx) => (
         <div key={stop.id} className="flex gap-4">
+          {/* Visual connector */}
           <div className="flex flex-col items-center">
             <div
               className={cn(
-                'w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold shrink-0',
+                'w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold flex-shrink-0',
                 STOP_TYPE_COLORS[stop.type],
               )}
             >
@@ -47,6 +48,7 @@ export function StopsList({ stops }: StopsListProps) {
             )}
           </div>
 
+          {/* Stop details */}
           <div className={cn('pb-5', idx === sorted.length - 1 && 'pb-0')}>
             <div className="flex items-center gap-2 mb-1">
               <span
@@ -62,7 +64,9 @@ export function StopsList({ stops }: StopsListProps) {
               )}
             </div>
 
-            {stop.locationName && <p className="text-sm font-medium">{stop.locationName}</p>}
+            {stop.locationName && (
+              <p className="text-sm font-medium">{stop.locationName}</p>
+            )}
 
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <MapPin className="h-3.5 w-3.5" />
@@ -72,13 +76,17 @@ export function StopsList({ stops }: StopsListProps) {
             </div>
 
             <div className="flex items-center gap-2 text-sm mt-1">
-              <span className="text-muted-foreground">{formatDate(stop.appointmentDate)}</span>
+              <span className="text-muted-foreground">
+                {formatDate(stop.appointmentDate)}
+              </span>
               <span className="text-xs bg-muted rounded px-1.5 py-0.5">
                 {APPOINTMENT_TYPE_LABELS[stop.appointmentType]}
               </span>
             </div>
 
-            {stop.notes && <p className="text-xs text-muted-foreground mt-1 italic">{stop.notes}</p>}
+            {stop.notes && (
+              <p className="text-xs text-muted-foreground mt-1 italic">{stop.notes}</p>
+            )}
           </div>
         </div>
       ))}

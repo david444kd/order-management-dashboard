@@ -41,3 +41,14 @@ export function formatRoute(stops: Stop[]): { primary: string; extra: number } {
 
   return { primary: `${pickupCity} → ${dropoffCity}`, extra: extraStops }
 }
+
+export function formatPaginationInfo(
+  page: number,
+  pageSize: number,
+  total: number,
+): string {
+  if (total === 0) return 'No results'
+  const from = (page - 1) * pageSize + 1
+  const to = Math.min(page * pageSize, total)
+  return `Showing ${from}–${to} of ${total}`
+}
