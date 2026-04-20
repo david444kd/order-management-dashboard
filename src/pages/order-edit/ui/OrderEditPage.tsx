@@ -1,10 +1,10 @@
 import { useParams, Navigate } from 'react-router-dom'
-import { OrderDetailWidget } from '@/widgets/order-detail'
+import { EditOrderWidget } from '@/widgets/edit-order'
 
-export function OrderDetailPage() {
+export function OrderEditPage() {
   const { id } = useParams<{ id: string }>()
 
   if (!id) return <Navigate to="/orders" replace />
 
-  return <OrderDetailWidget orderId={id} />
+  return <EditOrderWidget orderId={id} />
 }

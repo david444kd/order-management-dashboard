@@ -1,5 +1,21 @@
-export type { Order, OrderStatus, Carrier, Stop, EquipmentType, LoadType } from './model/types'
-export { orderKeys, orderApi } from './api/orderApi'
+export type {
+  Order,
+  OrderStatus,
+  EquipmentType,
+  LoadType,
+  StopType,
+  AppointmentType,
+  Address,
+  Stop,
+  Carrier,
+  StatusChange,
+} from './model/types'
+export { orderApi, orderKeys } from './api/orderApi'
 export type { GetOrdersParams } from './api/orderApi'
-export { useOrders, useOrder, useUpdateOrderStatus, useDeleteOrder } from './api/useOrders'
-export type { StatusChange, AppointmentType } from './model/types'
+export { useOrders, useOrder } from './api/useOrders'
+export {
+  useCreateOrder,
+  useUpdateOrder,
+  useDeleteOrder,
+  useUpdateOrderStatus,
+} from './api/useOrderMutations'

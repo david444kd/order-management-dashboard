@@ -42,16 +42,22 @@ export function TableCell({
 export function TableHead({
   children,
   className,
+  onClick,
+  sortable,
 }: {
   children: React.ReactNode
   className?: string
+  onClick?: () => void
+  sortable?: boolean
 }) {
   return (
     <th
       className={cn(
         'px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wide whitespace-nowrap',
+        sortable && 'cursor-pointer hover:text-foreground select-none',
         className,
       )}
+      onClick={onClick}
     >
       {children}
     </th>

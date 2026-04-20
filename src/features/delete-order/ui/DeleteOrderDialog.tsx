@@ -16,6 +16,7 @@ interface DeleteOrderDialogProps {
   onOpenChange: (open: boolean) => void
   orderId: string
   referenceNumber: string
+  onDeleted?: () => void
 }
 
 export function DeleteOrderDialog({
@@ -23,6 +24,7 @@ export function DeleteOrderDialog({
   onOpenChange,
   orderId,
   referenceNumber,
+  onDeleted,
 }: DeleteOrderDialogProps) {
   const { mutate: deleteOrder, isPending } = useDeleteOrder()
 
@@ -31,6 +33,7 @@ export function DeleteOrderDialog({
       onSuccess: () => {
         toast.success(`Order ${referenceNumber} deleted`)
         onOpenChange(false)
+        onDeleted?.()
       },
       onError: (err) => toast.error(err.message),
     })
