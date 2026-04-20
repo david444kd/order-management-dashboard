@@ -1,8 +1,15 @@
-import { PackageX, RefreshCw } from 'lucide-react'
+import { Eye, MoreHorizontal, PackageX, RefreshCw, Trash2 } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import type { Order } from '@/entities/order'
 import { StatusBadge } from '@/features/change-order-status'
 import { formatCurrency, formatDateShort, formatRoute } from '@/shared/lib/formatters'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/shared/ui/dropdown-menu'
 import { TableHead, TableRow, TableCell } from './TableComponents'
 import { OrdersTableSkeleton } from './OrdersTableSkeleton'
 
@@ -13,6 +20,8 @@ interface OrdersTableViewProps {
   skeletonRows: number
   onRetry: () => void
   onRowClick?: (orderId: string) => void
+  onView?: (orderId: string) => void
+  onDelete?: (order: Order) => void
 }
 
 export function OrdersTableView({
@@ -22,6 +31,8 @@ export function OrdersTableView({
   skeletonRows,
   onRetry,
   onRowClick,
+  onView,
+  onDelete,
 }: OrdersTableViewProps) {
   return (
     <div className="rounded-lg border bg-card overflow-hidden">
@@ -37,6 +48,7 @@ export function OrdersTableView({
               <TableHead>Pickup</TableHead>
               <TableHead>Rate</TableHead>
               <TableHead>Stops</TableHead>
+              <TableHead className="w-12">&nbsp;</TableHead>
             </tr>
           </thead>
           <tbody>
@@ -44,7 +56,7 @@ export function OrdersTableView({
               <OrdersTableSkeleton rows={skeletonRows} />
             ) : isError ? (
               <tr>
-                <td colSpan={8} className="px-4 py-16 text-center">
+                <td colSpan={9} className="px-4 py-16 text-center">
                   <div className="flex flex-col items-center gap-3 text-muted-foreground">
                     <RefreshCw className="h-8 w-8 opacity-50" />
                     <p className="font-medium">Failed to load orders</p>
@@ -57,7 +69,7 @@ export function OrdersTableView({
               </tr>
             ) : orders.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-4 py-16 text-center">
+                <td colSpan={9} className="px-4 py-16 text-center">
                   <div className="flex flex-col items-center gap-3 text-muted-foreground">
                     <PackageX className="h-8 w-8 opacity-50" />
                     <p className="font-medium">No orders found</p>
@@ -73,8 +85,8 @@ export function OrdersTableView({
                     <TableCell className="font-mono text-xs font-medium">
                       {order.referenceNumber}
                     </TableCell>
-                    <TableCell>
-                      <StatusBadge orderId={order.id} status={order.status} />
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <StatusBadge orderId={order.id} status={order.status} interactive />
                     </TableCell>
                     <TableCell className="max-w-[220px]">
                       <span className="truncate block text-sm">{route}</span>
@@ -93,6 +105,33 @@ export function OrdersTableView({
                       {formatCurrency(order.rate)}
                     </TableCell>
                     <TableCell className="text-center">{order.stops.length}</TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => onView?.(order.id)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View
+                          </DropdownMenuItem>
+                          {order.status === 'pending' && onDelete && (
+                            <>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="text-destructive focus:text-destructive"
+                                onClick={() => onDelete(order)}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
                   </TableRow>
                 )
               })
