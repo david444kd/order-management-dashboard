@@ -1,4 +1,5 @@
 import { OrdersTable } from '@/widgets/orders-table'
+import { OrdersFilters } from '@/features/filter-orders'
 
 export function OrdersListPage() {
   return (
@@ -8,6 +9,7 @@ export function OrdersListPage() {
           <h1 className="text-2xl font-bold tracking-tight">Orders</h1>
           <p className="text-muted-foreground text-sm mt-1">Manage and track all shipment orders</p>
         </div>
+        <OrdersFilters />
         <OrdersTable />
       </div>
     </div>
