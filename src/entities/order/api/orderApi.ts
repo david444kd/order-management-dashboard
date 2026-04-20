@@ -122,4 +122,40 @@ export const orderApi = {
       (c) => c.name.toLowerCase().includes(q) || c.mcNumber.toLowerCase().includes(q),
     )
   },
+
+  async updateOrderStatus(id: string, status: OrderStatus, note?: string): Promise<Order> {
+    await delay()
+    maybeError()
+
+    const orders = getOrdersDB()
+    const idx = orders.findIndex((o) => o.id === id)
+    if (idx === -1) throw new Error(`Order ${id} not found`)
+
+    const order = orders[idx]
+    const updated: Order = {
+      ...order,
+      status,
+      updatedAt: new Date().toISOString(),
+      statusHistory: [
+        ...order.statusHistory,
+        { from: order.status, to: status, changedAt: new Date().toISOString(), note },
+      ],
+    }
+    orders[idx] = updated
+    localStorage.setItem(MOCK_DB_ORDERS_KEY, JSON.stringify(orders))
+    return updated
+  },
+
+  async deleteOrder(id: string): Promise<void> {
+    await delay()
+    maybeError()
+
+    const orders = getOrdersDB()
+    const order = orders.find((o) => o.id === id)
+    if (!order) throw new Error(`Order ${id} not found`)
+    if (order.status !== 'pending') throw new Error('Only pending orders can be deleted')
+
+    const updated = orders.filter((o) => o.id !== id)
+    localStorage.setItem(MOCK_DB_ORDERS_KEY, JSON.stringify(updated))
+  },
 }

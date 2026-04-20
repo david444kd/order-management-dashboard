@@ -1,47 +1,10 @@
 import { PackageX, RefreshCw } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
-import { Badge } from '@/shared/ui/badge'
 import type { Order } from '@/entities/order'
+import { StatusBadge } from '@/features/change-order-status'
+import { formatCurrency, formatDateShort, formatRoute } from '@/shared/lib/formatters'
 import { TableHead, TableRow, TableCell } from './TableComponents'
 import { OrdersTableSkeleton } from './OrdersTableSkeleton'
-
-const STATUS_LABELS: Record<string, string> = {
-  pending: 'Pending',
-  in_transit: 'In Transit',
-  delivered: 'Delivered',
-  cancelled: 'Cancelled',
-}
-
-const STATUS_VARIANTS: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
-  pending: 'secondary',
-  in_transit: 'default',
-  delivered: 'outline',
-  cancelled: 'destructive',
-}
-
-function formatRoute(stops: Order['stops']) {
-  const pickup = stops.find((s) => s.type === 'pick_up')
-  const dropoff = stops.find((s) => s.type === 'drop_off')
-  if (!pickup || !dropoff) return '—'
-  return `${pickup.address.city}, ${pickup.address.state} → ${dropoff.address.city}, ${dropoff.address.state}`
-}
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(value)
-}
-
-function formatDate(iso: string | null) {
-  if (!iso) return '—'
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-}
 
 interface OrdersTableViewProps {
   orders: Order[]
@@ -49,6 +12,7 @@ interface OrdersTableViewProps {
   isError: boolean
   skeletonRows: number
   onRetry: () => void
+  onRowClick?: (orderId: string) => void
 }
 
 export function OrdersTableView({
@@ -57,6 +21,7 @@ export function OrdersTableView({
   isError,
   skeletonRows,
   onRetry,
+  onRowClick,
 }: OrdersTableViewProps) {
   return (
     <div className="rounded-lg border bg-card overflow-hidden">
@@ -102,18 +67,17 @@ export function OrdersTableView({
             ) : (
               orders.map((order) => {
                 const pickupStop = order.stops.find((s) => s.type === 'pick_up')
+                const { primary: route } = formatRoute(order.stops)
                 return (
-                  <TableRow key={order.id}>
+                  <TableRow key={order.id} onClick={onRowClick ? () => onRowClick(order.id) : undefined}>
                     <TableCell className="font-mono text-xs font-medium">
                       {order.referenceNumber}
                     </TableCell>
                     <TableCell>
-                      <Badge variant={STATUS_VARIANTS[order.status]}>
-                        {STATUS_LABELS[order.status]}
-                      </Badge>
+                      <StatusBadge orderId={order.id} status={order.status} />
                     </TableCell>
                     <TableCell className="max-w-[220px]">
-                      <span className="truncate block text-sm">{formatRoute(order.stops)}</span>
+                      <span className="truncate block text-sm">{route}</span>
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">{order.carrier.name}</div>
@@ -123,7 +87,7 @@ export function OrdersTableView({
                       {order.equipmentType.replace('_', ' ')}
                     </TableCell>
                     <TableCell className="text-sm whitespace-nowrap">
-                      {pickupStop?.appointmentDate ? formatDate(pickupStop.appointmentDate) : '—'}
+                      {pickupStop?.appointmentDate ? formatDateShort(pickupStop.appointmentDate) : '—'}
                     </TableCell>
                     <TableCell className="font-medium whitespace-nowrap">
                       {formatCurrency(order.rate)}
